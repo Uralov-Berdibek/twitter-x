@@ -1,12 +1,32 @@
+'use client'
+
+import useLoginModal from '@/hooks/useLoginModal'
+import useRegisterModal from '@/hooks/useRegisterModal'
 import Image from 'next/image'
+import { useCallback } from 'react'
 import { AiFillGithub } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
+import LoginModal from '../modals/login-modal'
+import RegisterModal from '../modals/register-modal'
 import Button from '../ui/button'
 
 export default function Auth() {
+	const registerModal = useRegisterModal()
+	const loginModal = useLoginModal()
+
+	const onOpenRegisterModal = useCallback(() => {
+		registerModal.onOpen()
+	}, [registerModal])
+
+	const onOpenLoginModal = useCallback(() => {
+		loginModal.onOpen()
+	}, [loginModal])
+
 	return (
 		<>
-			<div className='grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen px-2 md:px-0'>
+			<RegisterModal />
+			<LoginModal />
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen'>
 				<Image
 					src={'/images/x.svg'}
 					alt='X'
@@ -52,7 +72,7 @@ export default function Auth() {
 							<Button
 								label={'Create account'}
 								fullWidth
-								// onClick={onOpenRegisterModal}
+								onClick={onOpenRegisterModal}
 							/>
 							<div className='text-[10px] text-gray-400'>
 								By signing up, you agree to the{' '}
@@ -70,7 +90,7 @@ export default function Auth() {
 							label={'Sign in'}
 							fullWidth
 							outline
-							// onClick={onOpenLoginModal}
+							onClick={onOpenLoginModal}
 						/>
 					</div>
 				</div>
