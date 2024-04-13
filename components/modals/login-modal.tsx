@@ -13,6 +13,7 @@ import Button from '../ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import Modal from '../ui/modal'
+import { signIn } from "next-auth/react";
 
 export default function LoginModal() {
 	const [error, setError] = useState('')
@@ -37,7 +38,7 @@ export default function LoginModal() {
 		try {
 			const { data } = await axios.post('/api/auth/login', values)
 			if (data.success) {
-				// signIn('credentials', values)
+				signIn('credentials', values)
 				loginModal.onClose()
 			}
 		} catch (error: any) {
