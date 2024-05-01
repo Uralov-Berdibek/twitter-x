@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Bell, Home, User } from 'lucide-react';
+import { Bell, Home, User, Telescope } from 'lucide-react';
 import Link from 'next/link';
 import SidebarItem from './sidebar-item';
 import SidebarPostButton from './sidebar-post-button';
@@ -26,6 +26,12 @@ const Sidebar = ({ user }: { user: IUser }) => {
       label: 'Profile',
       path: `/profile/${user?._id}`,
       icon: User,
+    },
+
+    {
+      label: 'Explore',
+      path: '/explore',
+      icon: Telescope,
     },
   ];
   return (
