@@ -6,33 +6,51 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import Button from '../ui/button';
 import { toast } from '../ui/use-toast';
 import axios from 'axios';
-import user from './user';
 
 interface Props {
   placeholder: string;
   user: IUser;
+  postId?: string;
+  isComment?: boolean;
   setPosts: Dispatch<SetStateAction<IPost[]>>;
 }
 
-const Form = ({ placeholder, user, setPosts }: Props) => {
+const Form = ({ placeholder, user, setPosts, isComment, postId }: Props) => {
   const [body, setBody] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async () => {
     try {
       setIsLoading(true);
-      const { data } = await axios.post('/api/posts', {
-        body,
-        userId: user._id,
-      });
-      const newPost = { ...data, user };
-      setPosts((prev) => [newPost, ...prev]);
+      if (isComment) {
+        const { data } = await axios.post('/api/comments', {
+          body,
+          userId: user._id,
+          postId,
+        });
+        const newComment = {
+          ...data,
+          user,
+          likes: 0,
+          hasLiked: false,
+        };
+        setPosts((prev) => [newComment, ...prev]);
+      } else {
+        const { data } = await axios.post('/api/posts', {
+          body,
+          userId: user._id,
+        });
+        const newPost = {
+          ...data,
+          user,
+          likes: 0,
+          hasLiked: false,
+          comments: 0,
+        };
+        setPosts((prev) => [newPost, ...prev]);
+      }
       setIsLoading(false);
       setBody('');
-      toast({
-        title: 'Success',
-        description: 'Post created successfully.',
-      });
     } catch (error) {
       setIsLoading(false);
       toast({
@@ -64,7 +82,7 @@ const Form = ({ placeholder, user, setPosts }: Props) => {
 
           <div className='mt-4 flex flex-row justify-end'>
             <Button
-              label={'Post'}
+              label={isComment ? 'Reply' : 'Post'}
               classNames='px-8'
               disabled={isLoading || !body}
               onClick={onSubmit}

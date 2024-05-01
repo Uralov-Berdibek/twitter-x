@@ -5,29 +5,16 @@ import { connectToDatabase } from '@/lib/mognoose';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function GET(req: Request, route: { params: { userId: string } }) {
   try {
     await connectToDatabase();
 
-    const { body, userId } = await req.json();
-
-    const post = await Post.create({ body, user: userId });
-
-    return NextResponse.json(post);
-  } catch (error) {
-    const result = error as Error;
-    return NextResponse.json({ error: result.message }, { status: 400 });
-  }
-}
-
-export async function GET(req: Request) {
-  try {
-    await connectToDatabase();
     const { currentUser }: any = await getServerSession(authOptions);
+
     const { searchParams } = new URL(req.url);
     const limit = searchParams.get('limit');
 
-    const posts = await Post.find({})
+    const posts = await Post.find({ user: route.params.userId })
       .populate({
         path: 'user',
         model: User,
@@ -53,20 +40,6 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json(filteredPosts);
-  } catch (error) {
-    const result = error as Error;
-    return NextResponse.json({ error: result.message }, { status: 400 });
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    await connectToDatabase();
-    const { postId, userId } = await req.json();
-
-    await Post.findByIdAndDelete(postId);
-
-    return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error) {
     const result = error as Error;
     return NextResponse.json({ error: result.message }, { status: 400 });

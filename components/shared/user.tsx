@@ -15,7 +15,7 @@ const User = ({ user }: { user: IUser }) => {
         <div className='flex flex-col'>
           <p className='text-white font-semibold text-sm line-clamp-1'>{user.name}</p>
           <p className='text-neutral-400 text-sm line-clamp-1'>
-            {user.username ? `${sliceText(user.username, 16)}` : sliceText(user.email, 16)}
+            {user.username ? `@${sliceText(user.username, 16)}` : sliceText(user.email, 16)}
           </p>
         </div>
       </div>

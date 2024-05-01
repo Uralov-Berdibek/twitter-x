@@ -1,51 +1,47 @@
-import User from '@/database/user.model'
-import { connectToDatabase } from '@/lib/mognoose'
-import { hash } from 'bcrypt'
-import { NextResponse } from 'next/server'
+import User from '@/database/user.model';
+import { connectToDatabase } from '@/lib/mognoose';
+import { hash } from 'bcrypt';
+import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
-	try {
-		await connectToDatabase()
-		const { searchParams } = new URL(req.url)
-		const step = searchParams.get('step')
+export async function POST(req: any) {
+  try {
+    await connectToDatabase();
+    const { searchParams } = new URL(req.url);
+    const step = searchParams.get('step');
 
-		if (step === '1') {
-			const { email } = await req.json()
-			const isExistingUser = await User.findOne({ email })
+    if (step === '1') {
+      const { email } = await req.json();
+      const existingUser = await User.findOne({ email });
 
-			if (isExistingUser) {
-				return NextResponse.json(
-					{ error: 'Email already exists' },
-					{ status: 400 }
-				)
-			}
+      if (existingUser) {
+        return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+      }
 
-			return NextResponse.json({ success: true })
-		} else if (step === '2') {
-			const { email, username, name, password } = await req.json()
+      return NextResponse.json({ success: true });
+    } else if (step === '2') {
+      const { email, username, name, password } = await req.json();
 
-			const isExistinUsername = await User.findOne({ username })
+      const existingUsername = await User.findOne({ username });
 
-			if (isExistinUsername) {
-				return NextResponse.json(
-					{ error: 'Username already exists' },
-					{ status: 400 }
-				)
-			}
+      if (existingUsername) {
+        return NextResponse.json({ error: 'Username already exists' }, { status: 400 });
+      }
 
-			const hashedPassword = await hash(password, 10)
+      const hashedPassword = await hash(password, 10);
 
-			const user = await User.create({
-				email,
-				username,
-				name,
-				password: hashedPassword,
-			})
+      const newUser = await User.create({
+        email,
+        username,
+        name,
+        password: hashedPassword,
+      });
 
-			return NextResponse.json({ success: true, user })
-		}
-	} catch (error) {
-		const result = error as Error
-		return NextResponse.json({ error: result.message }, { status: 400 })
-	}
+      return NextResponse.json({ success: true, user: newUser });
+    } else {
+      return NextResponse.json({ error: 'Invalid step parameter' }, { status: 400 });
+    }
+  } catch (error) {
+    console.error('Error in POST:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
